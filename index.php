@@ -1,3 +1,8 @@
+<?php
+require_once 'conexion.php';
+$stmt = $pdo->query("SELECT * FROM comentarios ORDER BY fecha DESC");
+$comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -19,14 +24,14 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="index.html">Start Bootstrap</a>
+                <a class="navbar-brand" href="index.php">Start Bootstrap</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.php">Home</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="post.html">Sample Post</a></li>
                     </ul>
@@ -110,16 +115,15 @@
                     <div class="card shadow-sm">
                         <h2 class="card-header h5">Agregar comentario</h2>
                         <div class="card-body">
-                            <form id="comment-form">
+                            <form id="comment-form" action="guardar_comentario.php" method="POST">
                                 <div class="mb-3">
                                     <label class="form-label" for="comment-name">Nombre</label>
-                                    <input class="form-control" id="comment-name" name="name" placeholder="Tu nombre" autocomplete="name" required />
+                                    <input class="form-control" id="comment-name" name="nombre" placeholder="Tu nombre" autocomplete="name" required />
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="comment-message">Comentario</label>
-                                    <textarea class="form-control" id="comment-message" name="message" placeholder="Escribe tu comentario..." rows="3" required></textarea>
+                                    <textarea class="form-control" id="comment-message" name="comentario" placeholder="Escribe tu comentario..." rows="3" required></textarea>
                                 </div>
-                                <p class="small text-danger" id="comment-error" role="alert" hidden></p>
                                 <div class="d-flex justify-content-end">
                                     <button class="btn btn-primary" type="submit">Añadir comentario</button>
                                 </div>
@@ -129,10 +133,23 @@
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm">
-                        <h2 class="card-header h5" id="comments-title">Comentarios (<span id="comment-count" aria-live="polite">0</span>)</h2>
+                        <h2 class="card-header h5" id="comments-title">Comentarios (<span id="comment-count" aria-live="polite"><?= count($comentarios) ?></span>)</h2>
                         <div class="card-body comment-scroll" id="comment-scroll" role="region" aria-labelledby="comments-title" tabindex="0">
-                            <p class="small text-muted m-0" id="comment-empty">Todavía no hay comentarios. Sé el primero en comentar.</p>
-                            <ul class="list-unstyled m-0" id="comment-list" hidden></ul>
+                            <?php if (empty($comentarios)): ?>
+                                <p class="small text-muted m-0" id="comment-empty">Todavía no hay comentarios. Sé el primero en comentar.</p>
+                            <?php else: ?>
+                                <ul class="list-unstyled m-0" id="comment-list">
+                                    <?php foreach ($comentarios as $c): ?>
+                                        <li class="border-bottom pb-2 mb-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong><?= htmlspecialchars($c['nombre']) ?></strong>
+                                                <small class="text-muted"><?= htmlspecialchars($c['fecha']) ?></small>
+                                            </div>
+                                            <p class="mb-0 mt-1 small"><?= nl2br(htmlspecialchars($c['comentario'])) ?></p>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -178,6 +195,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
-        <script src="js/comments.js"></script>
+        <!-- Desactivado: los comentarios ahora se guardan en MySQL con PHP -->
+        <!-- <script src="js/comments.js"></script> -->
     </body>
 </html>
