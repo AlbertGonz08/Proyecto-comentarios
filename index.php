@@ -1,5 +1,6 @@
 <?php
 require_once 'conexion.php';
+// Traemos los comentarios, el más reciente primero
 $stmt = $pdo->query("SELECT * FROM comentarios ORDER BY fecha DESC");
 $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -117,12 +118,16 @@ $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="card-body">
                             <form id="comment-form" action="guardar_comentario.php" method="POST">
                                 <div class="mb-3">
-                                    <label class="form-label" for="comment-name">Nombre</label>
-                                    <input class="form-control" id="comment-name" name="nombre" placeholder="Tu nombre" autocomplete="name" required />
+                                    <label class="form-label" for="comment-title">Título</label>
+                                    <input class="form-control" id="comment-title" name="titulo" placeholder="Título del comentario" maxlength="150" required />
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="comment-message">Comentario</label>
-                                    <textarea class="form-control" id="comment-message" name="comentario" placeholder="Escribe tu comentario..." rows="3" required></textarea>
+                                    <label class="form-label" for="comment-name">Nombre de usuario</label>
+                                    <input class="form-control" id="comment-name" name="nombre_usuario" placeholder="Tu nombre de usuario" maxlength="50" autocomplete="username" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="comment-message">Descripción</label>
+                                    <textarea class="form-control" id="comment-message" name="descripcion" placeholder="Escribe tu comentario..." rows="3" required></textarea>
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     <button class="btn btn-primary" type="submit">Añadir comentario</button>
@@ -141,11 +146,11 @@ $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <ul class="list-unstyled m-0" id="comment-list">
                                     <?php foreach ($comentarios as $c): ?>
                                         <li class="border-bottom pb-2 mb-2">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <strong><?= htmlspecialchars($c['nombre']) ?></strong>
-                                                <small class="text-muted"><?= htmlspecialchars($c['fecha']) ?></small>
-                                            </div>
-                                            <p class="mb-0 mt-1 small"><?= nl2br(htmlspecialchars($c['comentario'])) ?></p>
+                                            <h3 class="h6 mb-1"><?= htmlspecialchars($c['titulo']) ?></h3>
+                                            <p class="mb-1 small"><?= nl2br(htmlspecialchars($c['descripcion'])) ?></p>
+                                            <small class="text-muted">
+                                                Por <?= htmlspecialchars($c['nombre_usuario']) ?> el <?= date('d/m/Y H:i', strtotime($c['fecha'])) ?>
+                                            </small>
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>

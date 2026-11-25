@@ -1,13 +1,39 @@
 <?php
+// Datos por defecto (Laragon y XAMPP usan root sin contraseña)
 $host = "localhost";
-$dbname = "proyecto_comentarios";
+$dbname = "comentarios_db";
 $user = "root";
 $pass = "";
 
+// En Replit usamos las variables de entorno
+$host = getenv('DB_HOST') ?: $host;
+$user = getenv('DB_USER') ?: $user;
+$pass = getenv('DB_PASS') ?: $pass;
+$dbname = getenv('DB_NAME') ?: $dbname;
+
+
+if (file_exists(__DIR__ . "/config.local.php")) {
+    include __DIR__ . "/config.local.php";
+    $pass = $clave ?? $pass;
+}
+
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
+    
+    $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4");
+    $pdo->exec("USE `$dbname`");
+
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS comentarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        titulo VARCHAR(150) NOT NULL,
+        descripcion TEXT NOT NULL,
+        nombre_usuario VARCHAR(50) NOT NULL,
+        fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
 } catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
 }
-?>
